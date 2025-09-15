@@ -6,12 +6,17 @@ function scrollToSection(index) {
   if (index >= 0 && index < sections.length) {
     isScrolling = true;
     sections[index].scrollIntoView({ behavior: "smooth" });
-    setTimeout(() => (isScrolling = false), 1000);
-    current = index;
+
+    // espera a animação e atualiza a seção atual + parallax
+    setTimeout(() => {
+      isScrolling = false;
+      current = index;
+      updateParallax();
+    }, 800);
   }
 }
 
-// Scroll travado por seções
+// controle do scroll travado
 window.addEventListener("wheel", (e) => {
   if (isScrolling) return;
   if (e.deltaY > 0) {
@@ -21,21 +26,12 @@ window.addEventListener("wheel", (e) => {
   }
 });
 
-// --- Parallax ---
+// --- Parallax (movimento mais lento do fundo) ---
 function updateParallax() {
-  const offset = current * window.innerHeight * 0.25; 
+  // cada seção tem 100vh → o fundo anda só 25% disso
+  const offset = current * window.innerHeight * 0.25;
   document.body.style.backgroundPosition = `center -${offset}px`;
 }
 
-// chamar sempre que mudar de seção
-function scrollToSection(index) {
-  if (index >= 0 && index < sections.length) {
-    isScrolling = true;
-    sections[index].scrollIntoView({ behavior: "smooth" });
-    setTimeout(() => {
-      isScrolling = false;
-      current = index;
-      updateParallax(); // atualiza o fundo
-    }, 1000);
-  }
-}
+// inicializa posição do fundo
+updateParallax();
