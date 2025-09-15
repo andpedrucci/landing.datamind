@@ -22,4 +22,9 @@ window.addEventListener("wheel", (e) => {
     // scroll para cima
     scrollToSection(current - 1);
   }
+  // --- Parallax ---
+window.addEventListener("scroll", () => {
+  const offset = window.scrollY * 0.25; // 25% da velocidade do scroll
+  document.querySelector(".bg1").style.backgroundPositionY = `-${offset}px`;
+});
 });
