@@ -13,6 +13,7 @@ function scrollToSection(index) {
   }
 }
 
+// Scroll travado por seções
 window.addEventListener("wheel", (e) => {
   if (isScrolling) return;
   if (e.deltaY > 0) {
@@ -22,9 +23,10 @@ window.addEventListener("wheel", (e) => {
     // scroll para cima
     scrollToSection(current - 1);
   }
-  // --- Parallax ---
+});
+
+// --- Parallax ---
 window.addEventListener("scroll", () => {
   const offset = window.scrollY * 0.25; // 25% da velocidade do scroll
   document.querySelector(".bg1").style.backgroundPositionY = `-${offset}px`;
-});
 });
