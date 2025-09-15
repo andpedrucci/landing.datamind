@@ -26,12 +26,11 @@ window.addEventListener("wheel", (e) => {
   }
 });
 
-// --- Parallax (movimento mais lento do fundo) ---
-function updateParallax() {
-  // cada seção tem 100vh → o fundo anda só 25% disso
-  const offset = current * window.innerHeight * 0.25;
+// --- Parallax controlado pelo scroll ---
+window.addEventListener("scroll", () => {
+  const offset = window.scrollY * 0.25; // move mais devagar
   document.body.style.backgroundPosition = `center -${offset}px`;
-}
+});
 
 // inicializa posição do fundo
 updateParallax();
