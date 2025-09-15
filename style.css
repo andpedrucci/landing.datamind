@@ -42,12 +42,29 @@ body {
   text-decoration: underline;
 }
 
-/* Espaço pro conteúdo não ficar escondido atrás do header */
-main {
-  padding-top: 80px;
+/* Seções em tela cheia */
+.page-section {
+  height: 100vh; /* ocupa a tela inteira */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  color: white;
 }
 
-section {
-  padding: 60px 20px;
-  min-height: 100vh; /* só pra ter bastante scroll */
+/* Seção 1 - fundo com parallax */
+.bg1 {
+  background: url("img/bg.jpg") no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed; /* base para o parallax */
+}
+
+/* Seção 2 - fundo colorido */
+.bg2 {
+  background: linear-gradient(135deg, #0077ff, #00cc88);
+}
+
+/* Seção 3 - fundo sólido */
+.bg3 {
+  background: #222;
 }
