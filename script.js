@@ -6,7 +6,7 @@ document.body.style.backgroundPosition = 'center 0px';
 
 function updateParallax() {
   // move o fundo mais devagar (25% da velocidade do scroll)
-  const offset = scroller.scrollTop * 0.25;
+  const offset = scroller.scrollTop * 0.50;
   document.body.style.backgroundPosition = `center -${offset}px`;
 }
 
