@@ -54,7 +54,7 @@ body {
 
 /* Seção 1 - fundo com parallax */
 .bg1 {
-  background: url("img/bg.jpg") no-repeat center center;
+  background: url("./img/bg.jpg") no-repeat center center;
   background-size: cover;
   background-attachment: fixed; /* base para o parallax */
 }
