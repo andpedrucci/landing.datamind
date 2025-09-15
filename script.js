@@ -1,5 +1,5 @@
 const sections = document.querySelectorAll(".page-section");
-let current = 0; 
+let current = 0;
 let isScrolling = false;
 
 function scrollToSection(index) {
@@ -23,6 +23,6 @@ window.addEventListener("wheel", (e) => {
 
 // --- Parallax ---
 window.addEventListener("scroll", () => {
-  const offset = window.scrollY * 0.25; // 25% da velocidade
+  const offset = window.scrollY * 0.25;
   document.body.style.backgroundPosition = `center ${-offset}px`;
 });
