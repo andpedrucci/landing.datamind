@@ -9,10 +9,11 @@ body {
   line-height: 1.6;
   overflow-y: scroll;
   height: 100vh;
-  background: url("./img/bg.jpg") no-repeat center top;
+  background: url("img/bg.jpg") no-repeat center top;
   background-size: cover;
-  background-attachment: scroll; /* vai se mover */
+  background-position: center 0; /* posição inicial */
 }
+
 
 /* Header fixo */
 .main-header {
