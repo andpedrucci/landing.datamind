@@ -7,9 +7,9 @@
 
 body {
   line-height: 1.6;
-  overflow: hidden; /* evita scroll livre */
+  overflow: hidden;
   position: relative;
-  background: url("./img/bg.jpg") no-repeat center center;
+  background: url("./img/bg.jpg") no-repeat center top;
   background-size: cover;
 }
 
@@ -29,11 +29,6 @@ body {
   z-index: 1000;
 }
 
-.main-header .logo {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
 .main-header nav a {
   color: white;
   text-decoration: none;
@@ -41,11 +36,7 @@ body {
   font-weight: 500;
 }
 
-.main-header nav a:hover {
-  text-decoration: underline;
-}
-
-/* Seções em tela cheia */
+/* Seções */
 .page-section {
   height: 100vh;
   display: flex;
@@ -53,8 +44,5 @@ body {
   align-items: center;
   font-size: 3rem;
   color: white;
-  background: transparent; /* deixa ver o fundo */
+  background: transparent; /* sempre transparente, o fundo é único */
 }
-
-.bg2 { color: #00ffcc; }
-.bg3 { color: #ffcc00; }
