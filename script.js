@@ -21,12 +21,8 @@ window.addEventListener("wheel", (e) => {
   }
 });
 
-// Parallax no fundo global
+// --- Parallax ---
 window.addEventListener("scroll", () => {
   const offset = window.scrollY * 0.25; // 25% da velocidade
-  document.body.style.setProperty(
-    "--bg-offset",
-    `-${offset}px`
-  );
   document.body.style.backgroundPosition = `center ${-offset}px`;
 });
