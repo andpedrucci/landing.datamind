@@ -9,13 +9,6 @@ body {
   line-height: 1.6;
   overflow: hidden; /* evita scroll livre */
   position: relative;
-}
-
-/* Fundo global com parallax */
-body {
-  line-height: 1.6;
-  overflow: hidden;
-  position: relative;
   background: url("./img/bg.jpg") no-repeat center center;
   background-size: cover;
 }
@@ -27,7 +20,7 @@ body {
   left: 0;
   width: 100%;
   height: 60px;
-  background-color: rgba(13, 27, 42, 0.9); /* semi-transparente */
+  background-color: rgba(13, 27, 42, 0.9);
   color: white;
   display: flex;
   justify-content: space-between;
@@ -63,11 +56,5 @@ body {
   background: transparent; /* deixa ver o fundo */
 }
 
-/* Seção 2 e 3 só mudam o estilo do texto */
-.bg2 {
-  color: #00ffcc;
-}
-
-.bg3 {
-  color: #ffcc00;
-}
+.bg2 { color: #00ffcc; }
+.bg3 { color: #ffcc00; }
