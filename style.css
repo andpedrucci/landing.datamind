@@ -1,0 +1,52 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  line-height: 1.6;
+}
+
+/* Header fixo */
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #0d1b2a; /* cor azul marinho escuro (igual sidebar CRM) */
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
+}
+
+.main-header .logo {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.main-header nav a {
+  color: white;
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: 500;
+}
+
+.main-header nav a:hover {
+  text-decoration: underline;
+}
+
+/* Espaço pro conteúdo não ficar escondido atrás do header */
+main {
+  padding-top: 80px;
+}
+
+section {
+  padding: 60px 20px;
+  min-height: 100vh; /* só pra ter bastante scroll */
+}
