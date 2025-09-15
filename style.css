@@ -7,10 +7,11 @@
 
 body {
   line-height: 1.6;
-  overflow: hidden;
-  position: relative;
+  overflow-y: scroll;
+  height: 100vh;
   background: url("./img/bg.jpg") no-repeat center top;
   background-size: cover;
+  background-attachment: scroll; /* vai se mover */
 }
 
 /* Header fixo */
@@ -29,20 +30,20 @@ body {
   z-index: 1000;
 }
 
-.main-header nav a {
-  color: white;
-  text-decoration: none;
-  margin-left: 20px;
-  font-weight: 500;
+/* Container com scroll travado */
+.scroll-container {
+  scroll-snap-type: y mandatory;
+  height: 100vh;
+  overflow-y: scroll;
 }
 
-/* Seções */
 .page-section {
+  scroll-snap-align: start;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 3rem;
   color: white;
-  background: transparent; /* sempre transparente, o fundo é único */
+  background: transparent;
 }
