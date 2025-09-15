@@ -1,14 +1,12 @@
-// script.js
-
 const sections = document.querySelectorAll(".page-section");
-let current = 0; // começa na primeira seção
+let current = 0; 
 let isScrolling = false;
 
 function scrollToSection(index) {
   if (index >= 0 && index < sections.length) {
     isScrolling = true;
     sections[index].scrollIntoView({ behavior: "smooth" });
-    setTimeout(() => (isScrolling = false), 1000); // tempo pra evitar scroll duplo
+    setTimeout(() => (isScrolling = false), 1000);
     current = index;
   }
 }
@@ -17,16 +15,18 @@ function scrollToSection(index) {
 window.addEventListener("wheel", (e) => {
   if (isScrolling) return;
   if (e.deltaY > 0) {
-    // scroll para baixo
     scrollToSection(current + 1);
   } else {
-    // scroll para cima
     scrollToSection(current - 1);
   }
 });
 
-// --- Parallax ---
+// Parallax no fundo global
 window.addEventListener("scroll", () => {
-  const offset = window.scrollY * 0.25; // 25% da velocidade do scroll
-  document.querySelector(".bg1").style.backgroundPositionY = `-${offset}px`;
+  const offset = window.scrollY * 0.25; // 25% da velocidade
+  document.body.style.setProperty(
+    "--bg-offset",
+    `-${offset}px`
+  );
+  document.body.style.backgroundPosition = `center ${-offset}px`;
 });
