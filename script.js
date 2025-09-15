@@ -22,7 +22,20 @@ window.addEventListener("wheel", (e) => {
 });
 
 // --- Parallax ---
-window.addEventListener("scroll", () => {
-  const offset = window.scrollY * 0.25;
-  document.body.style.backgroundPosition = `center ${-offset}px`;
-});
+function updateParallax() {
+  const offset = current * window.innerHeight * 0.25; 
+  document.body.style.backgroundPosition = `center -${offset}px`;
+}
+
+// chamar sempre que mudar de seção
+function scrollToSection(index) {
+  if (index >= 0 && index < sections.length) {
+    isScrolling = true;
+    sections[index].scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+      isScrolling = false;
+      current = index;
+      updateParallax(); // atualiza o fundo
+    }, 1000);
+  }
+}
