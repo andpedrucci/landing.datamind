@@ -46,7 +46,7 @@ body {
 .circuit-svg {
   position: fixed;
   bottom: 0;
-  width: 220px;
+  width: 45%; /* antes 220px, agora ocupa quase metade da tela */
   height: 100%;
   pointer-events: none;
   z-index: 0;
