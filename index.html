@@ -86,8 +86,8 @@
 <script>
 (function () {
   /* ====================== PARÂMETROS ====================== */
-  const NUM_TRACES   = 220;  // densidade de trilhas
-  const NUM_PADS     = 90;
+  const NUM_TRACES   = 150;  // densidade de trilhas
+  const NUM_PADS     = 50;
   const NUM_CHIPS    = 18;
 
   const STEP         = 44;   // tamanho da malha (maior = quadrados maiores)
@@ -143,36 +143,42 @@
   }
 
   function addPath(d, animate=true){
-    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
-    p.setAttribute('d', d);
-    p.setAttribute('class', 'trace');
+  const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d', d);
+  p.setAttribute('class', 'trace');
 
-    // espessuras variadas
-    const sw = Math.random()<.22 ? 3.2 : (Math.random()<.6 ? 2 : 1.4);
-    p.style.strokeWidth = sw;
-    svg.appendChild(p);
+  // espessuras variadas
+  const sw = Math.random()<.22 ? 3.2 : (Math.random()<.6 ? 2 : 1.4);
+  p.style.strokeWidth = sw;
+  svg.appendChild(p);
 
-    // comprimento real e animação escalonada
-    const len = p.getTotalLength() || 1;
-    const minDur   = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--min-dur')) || 10;
-    const maxDur   = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--max-dur')) || 22;
-    const buildWin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--build-window')) || 26;
+  // comprimento real e animação escalonada
+  const len = p.getTotalLength() || 1;
+  const minDur   = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--min-dur')) || 10;
+  const maxDur   = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--max-dur')) || 22;
+  const buildWin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--build-window')) || 26;
 
-    p.style.setProperty('--len', len);
-    if (animate){
-      const dur   = rnd(minDur, maxDur).toFixed(2)+'s';
-      const delay = rnd(0, buildWin).toFixed(2)+'s';
-      p.style.setProperty('--dur', dur);
-      p.style.setProperty('--delay', delay);
-      p.classList.add(LOOP ? 'loop' : 'grow'); // decide o tipo
-    } else {
-      // se algum dia quiser trilha estática desde o começo:
-      p.style.strokeDasharray = len;
-      p.style.strokeDashoffset = len; // começa escondida
-      // e pode animar depois via JS se precisar
-    }
-    return p;
+  p.style.setProperty('--len', len);
+  if (animate){
+    const dur   = rnd(minDur, maxDur).toFixed(2)+'s';
+    const delay = rnd(0, buildWin).toFixed(2)+'s';
+    p.style.setProperty('--dur', dur);
+    p.style.setProperty('--delay', delay);
+    p.classList.add(LOOP ? 'loop' : 'grow'); // decide o tipo
+  } else {
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
   }
+
+  // aqui sim: listener pra congelar no fim da animação
+  p.addEventListener("animationend", () => {
+    p.style.animation = "none";
+    p.style.strokeDasharray = p.getTotalLength();
+    p.style.strokeDashoffset = 0;
+  });
+
+  return p;
+}
 
   /* ====================== GERAÇÃO ====================== */
   for (let i=0;i<NUM_TRACES;i++){
