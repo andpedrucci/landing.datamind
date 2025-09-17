@@ -23,7 +23,7 @@
       filter: drop-shadow(0 0 6px rgba(30,201,184,0.7));
       stroke-dasharray: 2000;
       stroke-dashoffset: 2000;
-      animation: draw 8s linear infinite;
+      animation: draw 25s linear infinite;
     }
     .pad {
       fill: #0a0f0d;
@@ -50,8 +50,8 @@
   <script>
     function generatePCB(svgId, numTraces = 300, numPads = 80, numChips = 15) {
       const svg = document.getElementById(svgId);
-      const w = 1200, h = 800;
-      const step = 20; // grade bem mais densa
+      const w = 1280, h = 2048;
+      const step = 10; // grade bem mais densa
 
       function randCoord(max) {
         return Math.floor(Math.random() * (max / step)) * step;
