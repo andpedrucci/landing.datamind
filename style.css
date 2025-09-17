@@ -1,10 +1,24 @@
 body {
+  margin: 0;
   line-height: 1.6;
   height: 100vh;
   overflow: hidden; /* o body não scrolla */
-  background: url("img/bg.jpg") no-repeat center top;
-  background-size: cover;
-  background-position: center 0;
+  background: #fff; /* fundo limpo */
+}
+
+/* Header fixo */
+.main-header {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 10;
 }
 
 /* Container com scroll-snap */
@@ -12,7 +26,7 @@ body {
   height: 100vh;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
-  scroll-padding-top: 60px; /* compensa o header fixo */
+  scroll-padding-top: 60px; /* compensa o header */
 }
 
 .page-section {
@@ -23,6 +37,33 @@ body {
   justify-content: center;
   align-items: center;
   font-size: 2rem;
-  color: white;
-  background: transparent; /* deixa ver o fundo */
+  color: black;
+  background: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+/* SVG dos circuitos */
+.circuit-svg {
+  position: fixed;
+  bottom: 0;
+  width: 200px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.circuit-svg.left { left: 0; }
+.circuit-svg.right { right: 0; }
+
+.trace {
+  stroke: #1ec9b8;
+  stroke-width: 3;
+  fill: none;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000; /* começa invisível */
+  transition: stroke-dashoffset 1.2s ease;
+}
+.trace.grow {
+  stroke-dashoffset: 0; /* anima o desenho */
 }
