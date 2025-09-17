@@ -1,146 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Landing com Circuitos</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCB Procedural</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0a0f0d; /* fundo escuro pra destacar */
+    }
+    svg {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+    .trace {
+      stroke: #1ec9b8;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 6px rgba(30,201,184,0.7));
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+      animation: draw 6s linear forwards;
+    }
+    .pad {
+      fill: #0a0f0d;
+      stroke: #1ec9b8;
+      stroke-width: 2;
+      filter: drop-shadow(0 0 6px rgba(30,201,184,0.9));
+    }
+    .chip {
+      fill: none;
+      stroke: #1ec9b8;
+      stroke-width: 3;
+      filter: drop-shadow(0 0 6px rgba(30,201,184,0.8));
+    }
+    @keyframes draw {
+      to { stroke-dashoffset: 0; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Header fixo -->
-  <header class="main-header">
-    <div class="logo">Minha Landing</div>
-    <nav>
-      <a href="#sec1">Início</a>
-      <a href="#sec2">Sobre</a>
-      <a href="#sec3">Contato</a>
-    </nav>
-  </header>
+  <svg id="pcb" viewBox="0 0 1200 800"></svg>
 
-  <!-- ===== CIRCUITOS ESQUERDA ===== -->
-  <svg class="circuit-svg left" viewBox="0 0 1000 1200" preserveAspectRatio="xMinYMax meet">
-    <!-- backbone (estático na sec1) -->
-    <path id="L-backbone" class="trace step1" d="M40 0 V1200"/>
+  <script>
+    function generatePCB(svgId, numTraces = 50, numPads = 30, numChips = 6) {
+      const svg = document.getElementById(svgId);
+      const w = 1200, h = 800;
+      const step = 40; // grade de 40px
 
-    <!-- ramos diretos do backbone -->
-    <path id="L-r1" class="trace step1" d="M40 100 H300 V180 H180"/>
-    <path id="L-r2" class="trace step1" d="M40 200 H420 V260 H250"/>
+      function randCoord(max) {
+        return Math.floor(Math.random() * (max / step)) * step;
+      }
 
-    <!-- sub-ramos de r1/r2 (animam na sec2+) -->
-    <path id="L-r3" class="trace step2" d="M180 180 V300 H360"
-          data-begin-on="#L-r1" data-begin-at="0.6"/>
-    <path id="L-r4" class="trace step2" d="M250 260 V380 H430"
-          data-begin-on="#L-r2" data-begin-at="0.5"/>
+      // gerar trilhas
+      for (let i = 0; i < numTraces; i++) {
+        let x = randCoord(w);
+        let y = randCoord(h);
+        let len = Math.floor(Math.random() * 5 + 3); // 3 a 8 segmentos
+        let d = `M${x} ${y}`;
+        for (let j = 0; j < len; j++) {
+          if (Math.random() > 0.5) {
+            x += (Math.random() > 0.5 ? step : -step);
+          } else {
+            y += (Math.random() > 0.5 ? step : -step);
+          }
+          d += ` L${x} ${y}`;
+        }
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", d);
+        path.setAttribute("class", "trace");
+        path.style.animationDelay = `${Math.random() * 5}s`;
+        svg.appendChild(path);
+      }
 
-    <!-- ramos médios (animam na sec2) -->
-    <path id="L-r5" class="trace step2" d="M40 400 H500 V480 H300"
-          data-begin-on="#L-backbone" data-begin-at="0.35"/>
-    <path id="L-r6" class="trace step2" d="M40 550 H350 V640 H520"
-          data-begin-on="#L-backbone" data-begin-at="0.45"/>
+      // gerar pads circulares
+      for (let i = 0; i < numPads; i++) {
+        const cx = randCoord(w);
+        const cy = randCoord(h);
+        const pad = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        pad.setAttribute("cx", cx);
+        pad.setAttribute("cy", cy);
+        pad.setAttribute("r", 6);
+        pad.setAttribute("class", "pad");
+        svg.appendChild(pad);
+      }
 
-    <!-- sub-ramos médios (animam na sec3) -->
-    <path id="L-r7" class="trace step3" d="M300 480 V600 H600"
-          data-begin-on="#L-r5" data-begin-at="0.4"/>
-    <path id="L-r8" class="trace step3" d="M520 640 V760 H700"
-          data-begin-on="#L-r6" data-begin-at="0.4"/>
+      // gerar chips falsos (quadrados)
+      for (let i = 0; i < numChips; i++) {
+        const x = randCoord(w - 100);
+        const y = randCoord(h - 100);
+        const chip = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        chip.setAttribute("x", x);
+        chip.setAttribute("y", y);
+        chip.setAttribute("width", 80);
+        chip.setAttribute("height", 80);
+        chip.setAttribute("class", "chip");
+        svg.appendChild(chip);
+      }
+    }
 
-    <!-- ramos baixos (animam na sec3) -->
-    <path id="L-r9"  class="trace step3" d="M40 800 H420 V900 H650"
-          data-begin-on="#L-backbone" data-begin-at="0.7"/>
-    <path id="L-r10" class="trace step3" d="M40 1000 H280 V1080 H500"
-          data-begin-on="#L-backbone" data-begin-at="0.85"/>
-    <path id="L-r11" class="trace step3" d="M650 900 V1040 H820"
-          data-begin-on="#L-r9" data-begin-at="0.5"/>
-    <path id="L-r12" class="trace step3" d="M500 1080 V1160 H700"
-          data-begin-on="#L-r10" data-begin-at="0.4"/>
-
-    <!-- pads -->
-    <circle class="pad" cx="40" cy="100" r="6"/>
-    <circle class="pad" cx="300" cy="180" r="6"/>
-    <circle class="pad" cx="420" cy="260" r="6"/>
-    <circle class="pad" cx="500" cy="480" r="6"/>
-    <circle class="pad" cx="350" cy="640" r="6"/>
-    <circle class="pad" cx="650" cy="900" r="6"/>
-    <circle class="pad" cx="500" cy="1080" r="6"/>
-
-    <!-- pulse (só aparece a partir da sec2) -->
-    <circle class="pulse" data-step="2" r="5" fill="#1ec9b8">
-      <animateMotion dur="10s" repeatCount="indefinite">
-        <mpath href="#L-backbone"/>
-      </animateMotion>
-    </circle>
-  </svg>
-
-  <!-- ===== CIRCUITOS DIREITA ===== -->
-  <svg class="circuit-svg right" viewBox="0 0 1000 1200" preserveAspectRatio="xMaxYMax meet">
-    <!-- backbone (estático na sec1) -->
-    <path id="R-backbone" class="trace step1" d="M960 0 V1200"/>
-
-    <!-- ramos diretos -->
-    <path id="R-r1" class="trace step1" d="M960 150 H700 V220 H880"/>
-    <path id="R-r2" class="trace step1" d="M960 250 H600 V320 H760"/>
-
-    <!-- sub-ramos (sec2) -->
-    <path id="R-r3" class="trace step2" d="M700 220 V360 H500"
-          data-begin-on="#R-r1" data-begin-at="0.5"/>
-    <path id="R-r4" class="trace step2" d="M760 320 V420 H560"
-          data-begin-on="#R-r2" data-begin-at="0.6"/>
-
-    <!-- médios (sec2) -->
-    <path id="R-r5" class="trace step2" d="M960 450 H680 V520 H860"
-          data-begin-on="#R-backbone" data-begin-at="0.4"/>
-    <path id="R-r6" class="trace step2" d="M960 650 H750 V720 H950"
-          data-begin-on="#R-backbone" data-begin-at="0.55"/>
-
-    <!-- médios/baixos (sec3) -->
-    <path id="R-r7" class="trace step3" d="M680 520 V640 H420"
-          data-begin-on="#R-r5" data-begin-at="0.5"/>
-    <path id="R-r8" class="trace step3" d="M950 720 V860 H620"
-          data-begin-on="#R-r6" data-begin-at="0.4"/>
-    <path id="R-r9"  class="trace step3" d="M960 850 H600 V920 H820"
-          data-begin-on="#R-backbone" data-begin-at="0.75"/>
-    <path id="R-r10" class="trace step3" d="M960 1050 H580 V1120 H400"
-          data-begin-on="#R-backbone" data-begin-at="0.85"/>
-    <path id="R-r11" class="trace step3" d="M820 920 V1040 H300"
-          data-begin-on="#R-r9" data-begin-at="0.5"/>
-    <path id="R-r12" class="trace step3" d="M400 1120 V1180 H200"
-          data-begin-on="#R-r10" data-begin-at="0.4"/>
-
-    <!-- pads -->
-    <circle class="pad" cx="960" cy="150" r="6"/>
-    <circle class="pad" cx="700" cy="220" r="6"/>
-    <circle class="pad" cx="600" cy="320" r="6"/>
-    <circle class="pad" cx="680" cy="520" r="6"/>
-    <circle class="pad" cx="750" cy="720" r="6"/>
-    <circle class="pad" cx="820" cy="920" r="6"/>
-    <circle class="pad" cx="400" cy="1120" r="6"/>
-
-    <!-- pulse (só aparece na step2+) -->
-    <circle class="pulse" data-step="2" r="5" fill="#1ec9b8">
-      <animateMotion dur="10s" repeatCount="indefinite">
-        <mpath href="#R-backbone"/>
-      </animateMotion>
-    </circle>
-  </svg>
-
-  <!-- Conteúdo com scroll-snap -->
-  <main class="scroll-container">
-    <section id="sec1" class="page-section">
-      <h1>Seção 1</h1>
-      <p>Bem-vindo à primeira seção.</p>
-    </section>
-
-    <section id="sec2" class="page-section">
-      <h1>Seção 2</h1>
-      <p>Aqui vai a segunda parte da landing.</p>
-    </section>
-
-    <section id="sec3" class="page-section">
-      <h1>Seção 3</h1>
-      <p>Contato e informações finais.</p>
-    </section>
-  </main>
-
-  <script src="script.js"></script>
+    // gerar ao carregar
+    generatePCB("pcb");
+  </script>
 </body>
 </html>
