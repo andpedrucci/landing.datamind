@@ -1,126 +1,231 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PCB Procedural</title>
-  <style>
-    body {
-      margin: 0;
-      background: #0a0f0d;
-      overflow: hidden;
-    }
-    svg {
-      width: 100vw;
-      height: 100vh;
-      display: block;
-    }
-    .trace {
-      stroke: #1ec9b8;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      filter: drop-shadow(0 0 6px rgba(30,201,184,0.7));
-    }
-    .pad {
-      fill: #0a0f0d;
-      stroke: #1ec9b8;
-      stroke-width: 2;
-      filter: drop-shadow(0 0 6px rgba(30,201,184,0.9));
-    }
-    .chip {
-      fill: none;
-      stroke: #1ec9b8;
-      filter: drop-shadow(0 0 6px rgba(30,201,184,0.8));
-    }
-    @keyframes draw {
-      from { stroke-dashoffset: var(--path-length); }
-      to   { stroke-dashoffset: 0; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PCB Procedural Pro</title>
+<style>
+  :root{
+    /* VELOCIDADE GLOBAL: maior = mais lento */
+    --min-dur: 18s;
+    --max-dur: 42s;
+  }
+  html,body{
+    margin:0;
+    background:#0a0f0d;
+    overflow:hidden;
+    height:100%;
+  }
+  svg#pcb{
+    width:100vw;
+    height:100vh;
+    display:block;
+  }
+
+  /* Estilo base */
+  .trace{
+    stroke:#1ec9b8;
+    fill:none;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    filter:drop-shadow(0 0 6px rgba(30,201,184,.75));
+    will-change: stroke-dashoffset;
+    shape-rendering:geometricPrecision;
+  }
+  .trace.animated{
+    /* o JS seta --len, --dur, --delay por path */
+    stroke-dasharray: var(--len);
+    stroke-dashoffset: var(--len);
+    animation: grow var(--dur, 24s) linear var(--delay, 0s) infinite;
+  }
+  /* loop “cresce → some → recomeça” (sem voltar ao contrário) */
+  @keyframes grow{
+    0%   { stroke-dashoffset: var(--len); opacity:.0; }
+    6%   { opacity:1; }      /* fade-in rápido */
+    60%  { stroke-dashoffset: 0; opacity:1; }
+    100% { stroke-dashoffset: 0; opacity:0; } /* apaga no fim, reinicia suave */
+  }
+
+  .pad{
+    fill:#0a0f0d;
+    stroke:#1ec9b8;
+    stroke-width:2;
+    filter:drop-shadow(0 0 6px rgba(30,201,184,.9));
+  }
+  .chip{
+    fill:none;
+    stroke:#1ec9b8;
+    filter:drop-shadow(0 0 6px rgba(30,201,184,.85));
+  }
+</style>
 </head>
 <body>
   <svg id="pcb"></svg>
 
-  <script>
-    function generatePCB(svgId, numTraces = 400, numPads = 120, numChips = 25) {
-      const svg = document.getElementById(svgId);
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
-      const step = 60;
+<script>
+(() => {
+  // ======= PARÂMETROS TUNÁVEIS =======
+  const NUM_TRACES        = 420;   // total de trilhas
+  const FRACTION_ANIMATED = 0.45;  // % das trilhas que animam; resto fica estático (fluidez)
+  const NUM_PADS          = 140;
+  const NUM_CHIPS         = 26;
 
-      function randCoord(max) {
-        return Math.floor(Math.random() * (max / step)) * step;
-      }
+  const STEP              = 36;    // tamanho da grade (maior = “quadrados” maiores)
+  const MIN_SEGMENTS      = 28;    // cada trilha: de N a M passos
+  const MAX_SEGMENTS      = 64;
 
-      // trilhas
-      for (let i = 0; i < numTraces; i++) {
-        let x = randCoord(w);
-        let y = randCoord(h);
-        let len = Math.floor(Math.random() * 40 + 20);
-        let d = `M${x} ${y}`;
-        for (let j = 0; j < len; j++) {
-          if (Math.random() > 0.5) {
-            x += (Math.random() > 0.5 ? step : -step);
-          } else {
-            y += (Math.random() > 0.5 ? step : -step);
-          }
-          if (x < 0) x = 0;
-          if (y < 0) y = 0;
-          if (x > w) x = w;
-          if (y > h) y = h;
-          d += ` L${x} ${y}`;
+  const ALLOW_DIAGONAL    = true;  // ativa 45°
+  const BRANCH_CHANCE     = 0.12;  // chance de ramificar a partir de um ponto da trilha
+  const BRANCH_MIN        = 10;    // tamanho mínimo do ramo
+  const BRANCH_MAX        = 28;
+
+  const LONG_RUN_CHANCE   = 0.55;  // chance de manter a direção por vários passos
+  const LONG_RUN_MIN      = 3;     // mínimo de passos numa direção
+  const LONG_RUN_MAX      = 9;
+
+  // ======= SETUP SVG =======
+  const svg = document.getElementById('pcb');
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+  // ======= DIREÇÕES (90° + 45°) =======
+  const DIRS_90  = [[1,0],[-1,0],[0,1],[0,-1]];
+  const DIRS_45  = [[1,1],[-1,1],[1,-1],[-1,-1]];
+  const DIRS = ALLOW_DIAGONAL ? [...DIRS_90, ...DIRS_45] : DIRS_90;
+
+  // ======= FUNÇÕES AUX =======
+  const rnd = (min, max) => Math.random()*(max-min)+min;
+  const rndi = (min, max) => Math.floor(rnd(min, max+1));
+  const choice = arr => arr[Math.floor(Math.random()*arr.length)];
+
+  const toGrid = (v, max) => Math.min(Math.max(Math.round(v/STEP)*STEP, 0), max);
+
+  function randCoord(max){
+    return Math.floor(Math.random() * (max/STEP)) * STEP;
+  }
+
+  function clamp(x, min, max){ return x<min?min: x>max?max: x; }
+
+  // Constrói um caminho a partir de (x,y)
+  function buildPath(startX, startY, segments){
+    let x = toGrid(startX, W);
+    let y = toGrid(startY, H);
+    let d = `M${x} ${y}`;
+
+    let dir = choice(DIRS);
+    let runLeft = 0;
+
+    for (let i=0; i<segments; i++){
+      // define run-length (vários passos na mesma direção) pra ficar “avenida”
+      if (runLeft <= 0){
+        dir = choice(DIRS);
+        if (Math.random() < LONG_RUN_CHANCE){
+          runLeft = rndi(LONG_RUN_MIN, LONG_RUN_MAX);
+        } else {
+          runLeft = 1;
         }
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", d);
-        path.setAttribute("class", "trace");
-
-        const strokeWidth = Math.random() > 0.7 ? 3 : 1.5;
-        path.style.strokeWidth = strokeWidth;
-
-        svg.appendChild(path);
-
-        // calcula comprimento e aplica animação individual
-        const length = path.getTotalLength();
-        path.style.setProperty("--path-length", length);
-        path.style.strokeDasharray = length;
-        path.style.strokeDashoffset = length;
-
-        const duration = 20 + Math.random() * 25; // entre 20s e 45s
-        const delay = Math.random() * 15;
-
-        path.style.animation = `draw ${duration}s linear ${delay}s infinite alternate`;
       }
+      runLeft--;
 
-      // pads
-      for (let i = 0; i < numPads; i++) {
-        const cx = randCoord(w);
-        const cy = randCoord(h);
-        const pad = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        pad.setAttribute("cx", cx);
-        pad.setAttribute("cy", cy);
-        pad.setAttribute("r", Math.random() > 0.7 ? 6 : 4);
-        pad.setAttribute("class", "pad");
-        svg.appendChild(pad);
-      }
+      x += dir[0] * STEP;
+      y += dir[1] * STEP;
 
-      // chips
-      for (let i = 0; i < numChips; i++) {
-        const x = randCoord(w - 100);
-        const y = randCoord(h - 100);
-        const chip = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        chip.setAttribute("x", x);
-        chip.setAttribute("y", y);
-        chip.setAttribute("width", 40 + Math.random() * 120);
-        chip.setAttribute("height", 40 + Math.random() * 120);
-        chip.setAttribute("class", "chip");
-        chip.style.strokeWidth = Math.random() > 0.5 ? 2.5 : 4;
-        svg.appendChild(chip);
-      }
+      // Limites (mantém dentro da tela)
+      x = clamp(x, 0, W);
+      y = clamp(y, 0, H);
+
+      d += ` L${x} ${y}`;
+    }
+    return { d, endX:x, endY:y };
+  }
+
+  // Cria um <path> e aplica estilos/anim
+  function addPath(d, animated=true){
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d', d);
+    p.setAttribute('class', 'trace');
+
+    // espessura variável
+    const sw = Math.random() < .2 ? 3.5 : (Math.random()<.6 ? 2 : 1.4);
+    p.style.strokeWidth = sw;
+
+    svg.appendChild(p);
+
+    // comprimento real p/ animação suave
+    const len = p.getTotalLength() || 1;
+    if (animated){
+      // duração e atraso aleatórios (respeita CSS vars se quiser)
+      const minDur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--min-dur')) || 18;
+      const maxDur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--max-dur')) || 42;
+      const dur   = rnd(minDur, maxDur).toFixed(2) + 's';
+      const delay = rnd(0, 12).toFixed(2) + 's';
+
+      p.style.setProperty('--len', len);
+      p.style.setProperty('--dur', dur);
+      p.style.setProperty('--delay', delay);
+      p.classList.add('animated');
+    } else {
+      // estático já desenhado
+      p.style.strokeDasharray = len;
+      p.style.strokeDashoffset = 0;
     }
 
-    generatePCB("pcb");
-  </script>
+    return p;
+  }
+
+  // ======= GERAÇÃO DE TRILHAS COM RAMIFICAÇÃO =======
+  const pathsForAnim = []; // guardo só uma fração para animar
+
+  for (let i=0; i<NUM_TRACES; i++){
+    const segs = rndi(MIN_SEGMENTS, MAX_SEGMENTS);
+    const { d, endX, endY } = buildPath(randCoord(W), randCoord(H), segs);
+
+    // Decide se essa entra no grupo animado
+    const willAnimate = (Math.random() < FRACTION_ANIMATED);
+    const base = addPath(d, willAnimate);
+    if (willAnimate) pathsForAnim.push(base);
+
+    // Ramificação simples (1 filho curto a partir de um ponto do caminho)
+    if (Math.random() < BRANCH_CHANCE){
+      // escolhe um ponto “no meio” do caminho base
+      // aproximamos pegando o endX/endY com um pequeno desvio
+      const bx = clamp(endX + choice([-1,1])*STEP* rndi(1,2), 0, W);
+      const by = clamp(endY + choice([-1,1])*STEP* rndi(1,2), 0, H);
+      const bsegs = rndi(BRANCH_MIN, BRANCH_MAX);
+      const child = buildPath(bx, by, bsegs);
+      const childAnimated = (Math.random() < FRACTION_ANIMATED);
+      const childPath = addPath(child.d, childAnimated);
+      if (childAnimated) pathsForAnim.push(childPath);
+    }
+  }
+
+  // ======= PADS E CHIPS =======
+  for (let i=0; i<NUM_PADS; i++){
+    const cx = randCoord(W);
+    const cy = randCoord(H);
+    const pad = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    pad.setAttribute('cx', cx);
+    pad.setAttribute('cy', cy);
+    pad.setAttribute('r', Math.random()<.25 ? 6 : 4);
+    pad.setAttribute('class','pad');
+    svg.appendChild(pad);
+  }
+
+  for (let i=0; i<NUM_CHIPS; i++){
+    const x = randCoord(W-120);
+    const y = randCoord(H-120);
+    const chip = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    chip.setAttribute('x', x);
+    chip.setAttribute('y', y);
+    chip.setAttribute('width',  40 + Math.random()*140);
+    chip.setAttribute('height', 40 + Math.random()*140);
+    chip.setAttribute('class','chip');
+    chip.style.strokeWidth = Math.random() < .5 ? 2.5 : 4;
+    svg.appendChild(chip);
+  }
+
+})();
+</script>
 </body>
 </html>
