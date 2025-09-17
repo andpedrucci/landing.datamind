@@ -1,89 +1,98 @@
-// ======= Seleções =======
-const scroller = document.querySelector('.scroll-container');
-const sections = document.querySelectorAll('.page-section');
-const traces = Array.from(document.querySelectorAll('path.trace'));
-const pulses = Array.from(document.querySelectorAll('.pulse'));
+// Utilitários para animar trilhas SVG
+function animatePath(path, duration = 2000) {
+  return new Promise(resolve => {
+    const length = path.getTotalLength();
+    path.style.transition = "none";
+    path.style.strokeDasharray = length;
+    path.style.strokeDashoffset = length;
 
-// ======= Map id -> elemento (para dependências) =======
-const byId = new Map();
-traces.forEach(el => { if (el.id) byId.set(`#${el.id}`, el); });
+    // força reflow
+    path.getBoundingClientRect();
 
-// ======= Utilitários =======
-const DEFAULT_DUR = 2.4;  // s
-const JITTER = 0.16;      // s
+    path.style.transition = `stroke-dashoffset ${duration}ms ease-out`;
+    path.style.strokeDashoffset = "0";
 
-function getDur(el) {
-  const d = parseFloat(el.dataset.dur || '');
-  return Number.isFinite(d) ? d : DEFAULT_DUR;
+    setTimeout(() => resolve(), duration);
+  });
 }
 
-const delayCache = new Map();
-function getDelay(el) {
-  if (delayCache.has(el)) return delayCache.get(el);
+// Mapeia dependências de ramificação
+function setupBranching(paths) {
+  const graph = {};
 
-  let delay = parseFloat(el.dataset.delay || '0') || 0;
-  const parentSel = el.dataset.beginOn;
-  const at = parseFloat(el.dataset.beginAt || '');
-  if (parentSel) {
-    const parent = byId.get(parentSel);
+  paths.forEach(path => {
+    const parent = path.dataset.beginOn;
+    const at = parseFloat(path.dataset.beginAt || "0");
+
     if (parent) {
-      const parentDelay = getDelay(parent);
-      const parentDur = getDur(parent);
-      const frac = Number.isFinite(at) ? Math.min(Math.max(at, 0), 1) : 0.5;
-      delay += parentDelay + parentDur * frac;
+      if (!graph[parent]) graph[parent] = [];
+      graph[parent].push({ child: path, at });
     }
-  } else {
-    // pequeno jitter para não ficar robótico
-    delay += (Math.random() * (2 * JITTER)) - JITTER;
-  }
-  delay = Math.max(0, delay);
-  delayCache.set(el, delay);
-  return delay;
+  });
+
+  return graph;
 }
 
-// ======= Preparação: só step2/step3 animam =======
-// step1 fica estático e visível
-traces
-  .filter(el => !el.classList.contains('step1')) // apenas step2/3
-  .forEach(el => {
-    const len = el.getTotalLength();
-    el.style.setProperty('--len', `${len}`);
-    el.style.setProperty('--dur', `${getDur(el)}s`);
-    el.style.setProperty('--delay', `${getDelay(el)}s`);
-    el.classList.add('prep');           // esconde com dash e prepara a transição
+// Controla quando ativar
+function activateSection(sectionId, stepClass, branchingGraph) {
+  const paths = document.querySelectorAll(stepClass);
+
+  paths.forEach(path => {
+    // só anima se ainda não foi feito
+    if (!path.classList.contains("drawn")) {
+      const parent = path.dataset.beginOn;
+      const at = parseFloat(path.dataset.beginAt || "0");
+
+      if (!parent) {
+        // anima direto
+        animatePath(path).then(() => {
+          path.classList.add("drawn");
+        });
+      } else {
+        // espera o pai estar pronto no ponto certo
+        const parentPath = document.querySelector(parent);
+        const parentLength = parentPath.getTotalLength();
+        const triggerPoint = parentLength * at;
+
+        const checkProgress = () => {
+          const dashoffset = parseFloat(getComputedStyle(parentPath).strokeDashoffset);
+          const currentProgress = (parentLength - dashoffset) / parentLength;
+
+          if (currentProgress >= at) {
+            animatePath(path).then(() => path.classList.add("drawn"));
+            clearInterval(interval);
+          }
+        };
+
+        const interval = setInterval(checkProgress, 100);
+      }
+    }
   });
-
-// ======= Ativação progressiva (ACUMULA) =======
-const stepIndex = new Map([['sec1',1], ['sec2',2], ['sec3',3]]);
-let maxStepActivated = 1;               // sec1 é estática já
-
-function activateStep(stepNumber) {
-  // ativa trilhas daquela etapa
-  document.querySelectorAll(`.trace.step${stepNumber}.prep:not(.grow)`)
-    .forEach(el => el.classList.add('grow'));
-
-  // mostra pulses que têm data-step <= etapa
-  pulses.forEach(p => {
-    const s = parseInt(p.dataset.step || '2', 10);
-    if (s <= stepNumber) p.style.visibility = 'visible';
-  });
-
-  if (stepNumber > maxStepActivated) maxStepActivated = stepNumber;
 }
 
-// observer baseado no container com snap
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (!entry.isIntersecting) return;
-    const step = stepIndex.get(entry.target.id) || 0;
-    if (step >= 2) activateStep(step);  // step1 já estática; ativa 2/3
-  });
-}, { root: scroller, threshold: 0.8 });
+// --- Main ---
+document.addEventListener("DOMContentLoaded", () => {
+  const sections = document.querySelectorAll(".page-section");
+  const allPaths = document.querySelectorAll("path.trace");
 
-// Observar as seções
-sections.forEach(sec => observer.observe(sec));
+  // cria grafo de dependências
+  const branchingGraph = setupBranching(allPaths);
 
-// Garantir estado inicial (sec1 visível)
-window.addEventListener('load', () => {
-  // nada a fazer: step1 já está visível e estática por padrão
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (entry.target.id === "sec1") {
+          activateSection("sec1", ".step1", branchingGraph);
+        }
+        if (entry.target.id === "sec2") {
+          activateSection("sec2", ".step2", branchingGraph);
+        }
+        if (entry.target.id === "sec3") {
+          activateSection("sec3", ".step3", branchingGraph);
+        }
+      }
+    });
+  }, { threshold: 0.6 });
+
+  sections.forEach(sec => observer.observe(sec));
 });
