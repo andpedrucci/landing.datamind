@@ -54,18 +54,25 @@ body {
 .circuit-svg.left { left: 0; }
 .circuit-svg.right { right: 0; }
 
-/* já existia */
 .trace {
   stroke: #1ec9b8;
-  stroke-width: 2.2;
+  stroke-width: 3.8; /* mais grosso */
   fill: none;
-  stroke-dasharray: 1500;
-  stroke-dashoffset: 1500;
-  transition: stroke-dashoffset 1.1s ease;
-  /* >>> acrescentar: aparência de trilha PCB */
-  stroke-linecap: round;       /* ponta arredondada da trilha */
-  stroke-linejoin: round;      /* quina suave nas curvas H/V */
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  transition: stroke-dashoffset 2.2s ease-in-out;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px rgba(30,201,184,0.7));
 }
 
-/* opcional: deixar os SVGs mais “cheios” na lateral */
-.circuit-svg { width: 260px; }  /* antes era 220px */
+.step1.active { stroke-dashoffset: 0; transition-duration: 2.0s; }
+.step2.active { stroke-dashoffset: 0; transition-duration: 2.3s; }
+.step3.active { stroke-dashoffset: 0; transition-duration: 2.6s; }
+
+.pad {
+  fill: #fff;
+  stroke: #1ec9b8;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 4px rgba(30,201,184,0.9));
+}
