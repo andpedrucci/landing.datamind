@@ -1,12 +1,12 @@
+/* layout básico */
 body {
   margin: 0;
   line-height: 1.6;
   height: 100vh;
-  overflow: hidden;
+  overflow: hidden;            /* quem rola é o container */
   background: #fff;
 }
 
-/* Header fixo */
 .main-header {
   position: fixed;
   top: 0; left: 0;
@@ -21,12 +21,11 @@ body {
   z-index: 10;
 }
 
-/* Scroll travado */
 .scroll-container {
   height: 100vh;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
-  scroll-padding-top: 60px;
+  scroll-padding-top: 60px;     /* compensa header */
 }
 
 .page-section {
@@ -37,16 +36,16 @@ body {
   justify-content: center;
   align-items: center;
   font-size: 2rem;
-  color: black;
+  color: #000;
   position: relative;
   z-index: 1;
 }
 
-/* SVG */
+/* SVGs fixos */
 .circuit-svg {
   position: fixed;
   bottom: 0;
-  width: 45%; /* antes 220px, agora ocupa quase metade da tela */
+  width: 45%;
   height: 100%;
   pointer-events: none;
   z-index: 0;
@@ -54,34 +53,33 @@ body {
 .circuit-svg.left { left: 0; }
 .circuit-svg.right { right: 0; }
 
+/* trilhas */
 .trace {
   stroke: #1ec9b8;
-  stroke-width: 3.8; /* mais grosso */
+  stroke-width: 3.8;
   fill: none;
-  stroke-dasharray: 2000;
-  stroke-dashoffset: 2000;
-  transition: stroke-dashoffset 2.2s ease-in-out;
   stroke-linecap: round;
   stroke-linejoin: round;
   filter: drop-shadow(0 0 4px rgba(30,201,184,0.7));
 }
 
-.step1.active { stroke-dashoffset: 0; transition-duration: 2.0s; }
-.step2.active { stroke-dashoffset: 0; transition-duration: 2.3s; }
-.step3.active { stroke-dashoffset: 0; transition-duration: 2.6s; }
+/* as que vão animar recebem .prep pelo JS */
+.trace.prep {
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  transition: stroke-dashoffset var(--dur,2.4s) ease-in-out var(--delay,0s);
+}
+.trace.prep.grow { stroke-dashoffset: 0; }
 
+/* pads e pulses */
 .pad {
   fill: #fff;
   stroke: #1ec9b8;
   stroke-width: 2;
   filter: drop-shadow(0 0 4px rgba(30,201,184,0.9));
 }
-
 .pulse {
-  fill: url(#pulseGradient);
-  filter: drop-shadow(0 0 12px #1ec9b8);
-}
-
-svg defs {
-  position: absolute;
+  filter: drop-shadow(0 0 10px #1ec9b8);
+  opacity: .95;
+  visibility: hidden; /* só aparece a partir da sec2 */
 }
