@@ -8,6 +8,7 @@
     body {
       margin: 0;
       background: #0a0f0d;
+      overflow: hidden;
     }
     svg {
       width: 100vw;
@@ -23,7 +24,7 @@
       filter: drop-shadow(0 0 6px rgba(30,201,184,0.7));
       stroke-dasharray: 2000;
       stroke-dashoffset: 2000;
-      animation: draw 25s linear infinite;
+      animation: draw 60s linear infinite; /* <<< mais lento */
     }
     .pad {
       fill: #0a0f0d;
@@ -38,20 +39,23 @@
       filter: drop-shadow(0 0 6px rgba(30,201,184,0.8));
     }
     @keyframes draw {
-      0%   { stroke-dashoffset: 2000; }
-      50%  { stroke-dashoffset: 0; }
-      100% { stroke-dashoffset: 2000; }
+      0%   { stroke-dashoffset: 2000; opacity: 0; }
+      20%  { opacity: 1; }
+      60%  { stroke-dashoffset: 0; opacity: 1; }
+      100% { stroke-dashoffset: 2000; opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <svg id="pcb" viewBox="0 0 1200 800"></svg>
+  <svg id="pcb"></svg>
 
   <script>
-    function generatePCB(svgId, numTraces = 300, numPads = 80, numChips = 15) {
+    function generatePCB(svgId, numTraces = 500, numPads = 80, numChips = 15) {
       const svg = document.getElementById(svgId);
-      const w = 1280, h = 2048;
-      const step = 10; // grade bem mais densa
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+      const step = 15; // grade mais densa
 
       function randCoord(max) {
         return Math.floor(Math.random() * (max / step)) * step;
@@ -61,7 +65,7 @@
       for (let i = 0; i < numTraces; i++) {
         let x = randCoord(w);
         let y = randCoord(h);
-        let len = Math.floor(Math.random() * 12 + 4); // de 4 a 16 segmentos
+        let len = Math.floor(Math.random() * 30 + 20); // <<< linhas mais longas
         let d = `M${x} ${y}`;
         for (let j = 0; j < len; j++) {
           if (Math.random() > 0.5) {
@@ -69,7 +73,6 @@
           } else {
             y += (Math.random() > 0.5 ? step : -step);
           }
-          // limites
           if (x < 0) x = 0;
           if (y < 0) y = 0;
           if (x > w) x = w;
@@ -79,7 +82,7 @@
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", d);
         path.setAttribute("class", "trace");
-        path.style.animationDelay = `${Math.random() * 8}s`;
+        path.style.animationDelay = `${Math.random() * 10}s`; // delays variados
         svg.appendChild(path);
       }
 
@@ -109,8 +112,8 @@
       }
     }
 
-    // gerar ao carregar
     generatePCB("pcb");
   </script>
 </body>
 </html>
+
