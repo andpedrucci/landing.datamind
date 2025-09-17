@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Landing com Parallax</title>
+  <title>Landing com Circuitos</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,6 +16,14 @@
       <a href="#sec3">Contato</a>
     </nav>
   </header>
+
+  <!-- SVG fixo nos cantos -->
+  <svg class="circuit-svg left" viewBox="0 0 200 400" preserveAspectRatio="xMinYMax meet">
+    <path class="trace" d="M10 0 L10 100 L50 150 L50 250 L100 300" />
+  </svg>
+  <svg class="circuit-svg right" viewBox="0 0 200 400" preserveAspectRatio="xMaxYMax meet">
+    <path class="trace" d="M190 0 L190 100 L150 150 L150 250 L100 300" />
+  </svg>
 
   <!-- Conteúdo com scroll travado -->
   <main class="scroll-container">
