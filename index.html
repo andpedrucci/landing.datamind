@@ -1,3 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing com Circuitos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header fixo -->
+  <header class="main-header">
+    <div class="logo">Minha Landing</div>
+    <nav>
+      <a href="#sec1">Início</a>
+      <a href="#sec2">Sobre</a>
+      <a href="#sec3">Contato</a>
+    </nav>
+  </header>
+
 <!-- ===== CIRCUITOS ESQUERDA ===== -->
 <svg class="circuit-svg left" viewBox="0 0 1000 1200" preserveAspectRatio="xMinYMax meet">
   <!-- backbone -->
@@ -113,3 +132,25 @@
     </animateMotion>
   </circle>
 </svg>
+
+  <!-- Conteúdo com scroll travado -->
+  <main class="scroll-container">
+    <section id="sec1" class="page-section">
+      <h1>Seção 1</h1>
+      <p>Bem-vindo à primeira seção.</p>
+    </section>
+
+    <section id="sec2" class="page-section">
+      <h1>Seção 2</h1>
+      <p>Aqui vai a segunda parte da landing.</p>
+    </section>
+
+    <section id="sec3" class="page-section">
+      <h1>Seção 3</h1>
+      <p>Contato e informações finais.</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
