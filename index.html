@@ -17,71 +17,59 @@
     </nav>
   </header>
 
-<!-- ===== CIRCUITOS PREMIUM ESQUERDA ===== -->
-<svg class="circuit-svg left" viewBox="0 0 600 1200" preserveAspectRatio="xMinYMax meet">
-  <!-- backbone -->
+<!-- ===== CIRCUITOS ESQUERDA ===== -->
+<svg class="circuit-svg left" viewBox="0 0 1000 1200" preserveAspectRatio="xMinYMax meet">
+  <!-- backbone lateral -->
   <path id="left-backbone" class="trace step1" d="M40 0 V1200"/>
 
-  <!-- ramificações horizontais + verticais -->
-  <path class="trace step1" d="M40 80 H250 V160 H120"/>
-  <path class="trace step1" d="M40 160 H300 V220 H180"/>
-  <path class="trace step2" d="M40 320 H280 V400 H150 V480 H320"/>
-  <path class="trace step2" d="M40 480 H350 V560 H200 V640 H400"/>
-  <path class="trace step3" d="M40 720 H300 V800 H180 V880 H420"/>
-  <path class="trace step3" d="M40 960 H260 V1040 H120 V1120 H380"/>
+  <!-- ramificações horizontais e diagonais (avançam pro centro) -->
+  <path class="trace step1" d="M40 100 H400 V200 H200"/>
+  <path class="trace step1" d="M40 200 H500 V280 H300"/>
+  <path class="trace step2" d="M40 400 H600 V500 H250 V600 H700"/>
+  <path class="trace step2" d="M40 550 H450 V700 H650 V800 H350"/>
+  <path class="trace step3" d="M40 800 H500 V900 H750 V1000 H400"/>
+  <path class="trace step3" d="M40 1000 H300 V1100 H600 V1180"/>
 
   <!-- pads -->
-  <circle class="pad" cx="40" cy="80" r="6"/>
-  <circle class="pad" cx="250" cy="160" r="6"/>
-  <rect class="pad" x="295" y="215" width="12" height="12"/>
-  <circle class="pad" cx="400" cy="640" r="6"/>
-  <rect class="pad" x="415" y="875" width="12" height="12"/>
-<circle class="pulse" r="5" fill="#1ec9b8">
-  <animateMotion dur="8s" repeatCount="indefinite">
-    <mpath href="#left-backbone"/>
-  </animateMotion>
-</circle>
-<defs>
-  <radialGradient id="pulseGradient" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#1ec9b8" stop-opacity="1"/>
-    <stop offset="100%" stop-color="#1ec9b8" stop-opacity="0"/>
-  </radialGradient>
-</defs>
+  <circle class="pad" cx="40" cy="100" r="6"/>
+  <circle class="pad" cx="400" cy="200" r="6"/>
+  <circle class="pad" cx="700" cy="600" r="6"/>
+  <circle class="pad" cx="750" cy="1000" r="6"/>
+
+  <!-- pulsos -->
+  <circle class="pulse" r="5" fill="#1ec9b8">
+    <animateMotion dur="10s" repeatCount="indefinite">
+      <mpath href="#left-backbone"/>
+    </animateMotion>
+  </circle>
 </svg>
 
-<!-- ===== CIRCUITOS PREMIUM DIREITA ===== -->
-<svg class="circuit-svg right" viewBox="0 0 600 1200" preserveAspectRatio="xMaxYMax meet">
-  <!-- backbone -->
-  <path id="right-backbone" class="trace step1" d="M560 0 V1200"/>
+<!-- ===== CIRCUITOS DIREITA ===== -->
+<svg class="circuit-svg right" viewBox="0 0 1000 1200" preserveAspectRatio="xMaxYMax meet">
+  <!-- backbone lateral -->
+  <path id="right-backbone" class="trace step1" d="M960 0 V1200"/>
 
-  <!-- ramificações -->
-  <path class="trace step1" d="M560 100 H350 V180 H470"/>
-  <path class="trace step1" d="M560 200 H280 V260 H420"/>
-  <path class="trace step2" d="M560 360 H300 V440 H480 V520 H200"/>
-  <path class="trace step2" d="M560 520 H260 V600 H430 V680 H150"/>
-  <path class="trace step3" d="M560 760 H320 V840 H460 V920 H240"/>
-  <path class="trace step3" d="M560 980 H280 V1060 H390 V1140 H180"/>
+  <!-- ramificações diferentes da esquerda -->
+  <path class="trace step1" d="M960 150 H600 V220 H820"/>
+  <path class="trace step1" d="M960 250 H550 V350 H700"/>
+  <path class="trace step2" d="M960 450 H500 V600 H750 V700 H400"/>
+  <path class="trace step2" d="M960 650 H700 V800 H900 V950 H500"/>
+  <path class="trace step3" d="M960 850 H550 V1000 H800 V1100 H300"/>
+  <path class="trace step3" d="M960 1050 H600 V1150 H400 V1180"/>
 
   <!-- pads -->
-  <circle class="pad" cx="560" cy="100" r="6"/>
-  <circle class="pad" cx="350" cy="180" r="6"/>
-  <rect class="pad" x="415" y="675" width="12" height="12"/>
-  <circle class="pad" cx="240" cy="920" r="6"/>
-  <rect class="pad" x="175" y="1135" width="12" height="12"/>
-<!-- pulses direita -->
-<circle class="pulse" r="5" fill="#1ec9b8">
-  <animateMotion dur="8s" repeatCount="indefinite">
-    <mpath href="#right-backbone"/>
-  </animateMotion>
-</circle>
-<defs>
-  <radialGradient id="pulseGradient" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#1ec9b8" stop-opacity="1"/>
-    <stop offset="100%" stop-color="#1ec9b8" stop-opacity="0"/>
-  </radialGradient>
-</defs>
-</svg>
+  <circle class="pad" cx="960" cy="150" r="6"/>
+  <circle class="pad" cx="600" cy="220" r="6"/>
+  <circle class="pad" cx="750" cy="600" r="6"/>
+  <circle class="pad" cx="800" cy="1100" r="6"/>
 
+  <!-- pulsos -->
+  <circle class="pulse" r="5" fill="#1ec9b8">
+    <animateMotion dur="10s" repeatCount="indefinite">
+      <mpath href="#right-backbone"/>
+    </animateMotion>
+  </circle>
+</svg>
   <!-- Conteúdo com scroll travado -->
   <main class="scroll-container">
     <section id="sec1" class="page-section">
