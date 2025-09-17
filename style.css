@@ -56,14 +56,13 @@ body {
 
 .trace {
   stroke: #1ec9b8;
-  stroke-width: 3;
+  stroke-width: 2;
   fill: none;
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000; /* escondido */
   transition: stroke-dashoffset 1.2s ease;
 }
 
-/* estados progressivos */
-.step1.active { stroke-dashoffset: 0; }
-.step2.active { stroke-dashoffset: 0; }
-.step3.active { stroke-dashoffset: 0; }
+.step1.active { stroke-dashoffset: 0; transition-duration: 1s; }
+.step2.active { stroke-dashoffset: 0; transition-duration: 1.2s; }
+.step3.active { stroke-dashoffset: 0; transition-duration: 1.4s; }
