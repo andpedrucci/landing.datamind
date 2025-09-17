@@ -36,10 +36,16 @@
 
   /* cresce e FICA desenhado (sem piscar) */
   .trace.grow {
-    stroke-dasharray: var(--len);
-    stroke-dashoffset: var(--len);
-    animation: growHold var(--dur, 16s) linear var(--delay, 0s) forwards;
-  }
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  animation: growHold var(--dur, 16s) linear var(--delay, 0s) forwards;
+}
+
+@keyframes growHold {
+  0%   { stroke-dashoffset: var(--len); opacity:0; }
+  10%  { opacity:1; }
+  100% { stroke-dashoffset: 0; opacity:1; }  /* nunca volta pra 0 de opacidade */
+}
 
   /* se quiser looping depois, troque 'grow' por 'loop' no JS */
   .trace.loop {
