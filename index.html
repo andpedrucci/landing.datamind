@@ -7,7 +7,7 @@
   <style>
     body {
       margin: 0;
-      background: #0a0f0d; /* fundo escuro pra destacar */
+      background: #0a0f0d;
     }
     svg {
       width: 100vw;
@@ -23,7 +23,7 @@
       filter: drop-shadow(0 0 6px rgba(30,201,184,0.7));
       stroke-dasharray: 2000;
       stroke-dashoffset: 2000;
-      animation: draw 6s linear forwards;
+      animation: draw 8s linear infinite;
     }
     .pad {
       fill: #0a0f0d;
@@ -38,7 +38,9 @@
       filter: drop-shadow(0 0 6px rgba(30,201,184,0.8));
     }
     @keyframes draw {
-      to { stroke-dashoffset: 0; }
+      0%   { stroke-dashoffset: 2000; }
+      50%  { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: 2000; }
     }
   </style>
 </head>
@@ -46,20 +48,20 @@
   <svg id="pcb" viewBox="0 0 1200 800"></svg>
 
   <script>
-    function generatePCB(svgId, numTraces = 50, numPads = 30, numChips = 6) {
+    function generatePCB(svgId, numTraces = 300, numPads = 80, numChips = 15) {
       const svg = document.getElementById(svgId);
       const w = 1200, h = 800;
-      const step = 40; // grade de 40px
+      const step = 20; // grade bem mais densa
 
       function randCoord(max) {
         return Math.floor(Math.random() * (max / step)) * step;
       }
 
-      // gerar trilhas
+      // trilhas
       for (let i = 0; i < numTraces; i++) {
         let x = randCoord(w);
         let y = randCoord(h);
-        let len = Math.floor(Math.random() * 5 + 3); // 3 a 8 segmentos
+        let len = Math.floor(Math.random() * 12 + 4); // de 4 a 16 segmentos
         let d = `M${x} ${y}`;
         for (let j = 0; j < len; j++) {
           if (Math.random() > 0.5) {
@@ -67,36 +69,41 @@
           } else {
             y += (Math.random() > 0.5 ? step : -step);
           }
+          // limites
+          if (x < 0) x = 0;
+          if (y < 0) y = 0;
+          if (x > w) x = w;
+          if (y > h) y = h;
           d += ` L${x} ${y}`;
         }
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", d);
         path.setAttribute("class", "trace");
-        path.style.animationDelay = `${Math.random() * 5}s`;
+        path.style.animationDelay = `${Math.random() * 8}s`;
         svg.appendChild(path);
       }
 
-      // gerar pads circulares
+      // pads
       for (let i = 0; i < numPads; i++) {
         const cx = randCoord(w);
         const cy = randCoord(h);
         const pad = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         pad.setAttribute("cx", cx);
         pad.setAttribute("cy", cy);
-        pad.setAttribute("r", 6);
+        pad.setAttribute("r", 5);
         pad.setAttribute("class", "pad");
         svg.appendChild(pad);
       }
 
-      // gerar chips falsos (quadrados)
+      // chips
       for (let i = 0; i < numChips; i++) {
         const x = randCoord(w - 100);
         const y = randCoord(h - 100);
         const chip = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         chip.setAttribute("x", x);
         chip.setAttribute("y", y);
-        chip.setAttribute("width", 80);
-        chip.setAttribute("height", 80);
+        chip.setAttribute("width", 60 + Math.random()*60);
+        chip.setAttribute("height", 60 + Math.random()*60);
         chip.setAttribute("class", "chip");
         svg.appendChild(chip);
       }
