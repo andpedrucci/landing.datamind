@@ -76,3 +76,12 @@ body {
   stroke-width: 2;
   filter: drop-shadow(0 0 4px rgba(30,201,184,0.9));
 }
+
+.pulse {
+  fill: url(#pulseGradient);
+  filter: drop-shadow(0 0 12px #1ec9b8);
+}
+
+svg defs {
+  position: absolute;
+}
