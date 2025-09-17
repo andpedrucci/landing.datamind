@@ -1,17 +1,17 @@
-// Seleciona o container que faz o scroll
-const scroller = document.querySelector('.scroll-container');
+// Seleciona as seções e as trilhas dos circuitos
+const sections = document.querySelectorAll(".page-section");
+const traces = document.querySelectorAll(".trace");
 
-// posição inicial
-document.body.style.backgroundPosition = 'center 0px';
+// Observa quando a seção entra em tela
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      // quando a seção 2 ou 3 entra em tela, aciona animação
+      if(entry.target.id === "sec2" || entry.target.id === "sec3"){
+        traces.forEach(t => t.classList.add("grow"));
+      }
+    }
+  })
+},{threshold:0.6});
 
-function updateParallax() {
-  // move o fundo mais devagar (25% da velocidade do scroll)
-  const offset = scroller.scrollTop * 0.50;
-  document.body.style.backgroundPosition = `center -${offset}px`;
-}
-
-// atualiza enquanto o container rola
-scroller.addEventListener('scroll', updateParallax);
-
-// chamada inicial
-updateParallax();
+sections.forEach(sec=>observer.observe(sec));
