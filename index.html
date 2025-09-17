@@ -17,34 +17,64 @@
     </nav>
   </header>
 
-<!-- SVG Esquerda -->
-<svg class="circuit-svg left" viewBox="0 0 400 1200" preserveAspectRatio="xMinYMax meet">
-  <!-- várias linhas lado esquerdo -->
-  <path class="trace step1" d="M30 0 L30 150 L90 250 L60 400" />
-  <path class="trace step1" d="M80 0 L80 200 L150 280 L100 500" />
-  <path class="trace step1" d="M120 0 L120 180 L60 300 L140 450" />
-  <path class="trace step2" d="M50 400 L90 550 L160 700 L100 850" />
-  <path class="trace step2" d="M20 300 L70 480 L50 650 L130 900" />
-  <path class="trace step2" d="M150 500 L200 650 L160 800 L210 1000" />
-  <path class="trace step3" d="M90 700 L40 850 L100 1000 L60 1150" />
-  <path class="trace step3" d="M200 800 L240 950 L180 1100 L150 1200" />
-  <path class="trace step3" d="M20 900 L80 1050 L40 1200" />
+<!-- SVG ESQUERDA (denso, ortogonal, com ramificações) -->
+<svg class="circuit-svg left" viewBox="0 0 300 1200" preserveAspectRatio="xMinYMax meet">
+  <!-- backbone em 3 etapas para crescer por seção -->
+  <path class="trace step1" d="M24 0 V280"/>
+  <path class="trace step2" d="M24 280 V760"/>
+  <path class="trace step3" d="M24 760 V1180"/>
+
+  <!-- ramificações ── etapa 1 (visível na Seção 1) -->
+  <path class="trace step1" d="M24 30 H120 V60 H70 V90 H150"/>
+  <path class="trace step1" d="M24 70 H95 V120 H60 V160 H130 V200"/>
+  <path class="trace step1" d="M24 110 H80 V140 H140 V170"/>
+  <path class="trace step1" d="M24 160 H110"/>
+  <path class="trace step1" d="M24 210 H150 V230 H90"/>
+
+  <!-- etapa 2 (cresce na Seção 2) -->
+  <path class="trace step2" d="M24 300 H100 V340 H60 V380 H140"/>
+  <path class="trace step2" d="M24 340 H150 V400 H90 V440 H170"/>
+  <path class="trace step2" d="M24 390 H80 V500 H160 V540 H100 V580 H200"/>
+  <path class="trace step2" d="M24 450 H120 V470 H60"/>
+  <path class="trace step2" d="M24 520 H130 V560 H90 V620 H170 V660"/>
+  <path class="trace step2" d="M24 600 H140 V640 H60 V700 H190"/>
+
+  <!-- etapa 3 (finaliza na Seção 3) -->
+  <path class="trace step3" d="M24 780 H110 V820 H70 V860 H150 V900 H90"/>
+  <path class="trace step3" d="M24 840 H160 V900 H120 V960 H200"/>
+  <path class="trace step3" d="M24 900 H90 V980 H150 V1040 H110 V1100 H220"/>
+  <path class="trace step3" d="M24 1040 H130 V1080 H70 V1130 H180"/>
 </svg>
 
-<!-- SVG Direita -->
-<svg class="circuit-svg right" viewBox="0 0 400 1200" preserveAspectRatio="xMaxYMax meet">
-  <!-- várias linhas lado direito -->
-  <path class="trace step1" d="M370 0 L370 180 L300 300 L350 450" />
-  <path class="trace step1" d="M320 0 L320 220 L250 360 L280 520" />
-  <path class="trace step1" d="M280 0 L280 200 L330 350 L300 480" />
-  <path class="trace step1" d="M350 100 L280 250 L330 400 L270 600" />
-  <path class="trace step2" d="M300 400 L360 550 L280 700 L340 900" />
-  <path class="trace step2" d="M250 500 L200 650 L280 850 L220 1050" />
-  <path class="trace step2" d="M360 600 L320 800 L380 1000 L300 1150" />
-  <path class="trace step3" d="M280 700 L240 900 L300 1100 L260 1200" />
-  <path class="trace step3" d="M200 800 L260 1000 L180 1150" />
-  <path class="trace step3" d="M350 900 L300 1100 L370 1200" />
+<!-- SVG DIREITA (não espelhado; mais linhas e cruzamentos horizontais) -->
+<svg class="circuit-svg right" viewBox="0 0 300 1200" preserveAspectRatio="xMaxYMax meet">
+  <!-- backbone em 3 etapas -->
+  <path class="trace step1" d="M276 0 V260"/>
+  <path class="trace step2" d="M276 260 V740"/>
+  <path class="trace step3" d="M276 740 V1180"/>
+
+  <!-- etapa 1 -->
+  <path class="trace step1" d="M276 20 H190 V40 H230 V70 H170"/>
+  <path class="trace step1" d="M276 60 H210 V110 H250 V140 H200 V170"/>
+  <path class="trace step1" d="M276 110 H230 V150 H160 V190"/>
+  <path class="trace step1" d="M276 150 H220"/>
+  <path class="trace step1" d="M276 200 H240 V230 H190 V260"/>
+
+  <!-- etapa 2 -->
+  <path class="trace step2" d="M276 300 H220 V340 H260 V380 H210 V420"/>
+  <path class="trace step2" d="M276 340 H200 V380 H240 V460 H170"/>
+  <path class="trace step2" d="M276 390 H230 V450 H260 V520 H190 V560"/>
+  <path class="trace step2" d="M276 440 H250 V500 H210 V540 H150 V600"/>
+  <path class="trace step2" d="M276 520 H230 V560 H270 V600 H200 V660 H140"/>
+  <path class="trace step2" d="M276 600 H260 V640 H220 V700 H180 V740"/>
+
+  <!-- etapa 3 -->
+  <path class="trace step3" d="M276 780 H220 V820 H260 V860 H210 V900 H150"/>
+  <path class="trace step3" d="M276 840 H200 V900 H240 V960 H170 V1000"/>
+  <path class="trace step3" d="M276 900 H230 V980 H190 V1040 H250 V1080 H200"/>
+  <path class="trace step3" d="M276 1040 H240 V1080 H210 V1120 H170 V1160"/>
 </svg>
+
 
 
 
