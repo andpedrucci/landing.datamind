@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Landing com Circuitos</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <!-- Header fixo -->
@@ -19,40 +19,36 @@
 
   <!-- ===== CIRCUITOS ESQUERDA ===== -->
   <svg class="circuit-svg left" viewBox="0 0 1000 1200" preserveAspectRatio="xMinYMax meet">
-    <!-- backbone -->
+    <!-- backbone (estático na sec1) -->
     <path id="L-backbone" class="trace step1" d="M40 0 V1200"/>
 
-    <!-- ramos diretos -->
-    <path id="L-r1" class="trace step1" d="M40 100 H300 V180 H180"
-          data-begin-on="#L-backbone" data-begin-at="0.1"/>
-    <path id="L-r2" class="trace step1" d="M40 200 H420 V260 H250"
-          data-begin-on="#L-backbone" data-begin-at="0.18"/>
+    <!-- ramos diretos do backbone -->
+    <path id="L-r1" class="trace step1" d="M40 100 H300 V180 H180"/>
+    <path id="L-r2" class="trace step1" d="M40 200 H420 V260 H250"/>
 
-    <!-- sub-ramos -->
+    <!-- sub-ramos de r1/r2 (animam na sec2+) -->
     <path id="L-r3" class="trace step2" d="M180 180 V300 H360"
           data-begin-on="#L-r1" data-begin-at="0.6"/>
     <path id="L-r4" class="trace step2" d="M250 260 V380 H430"
           data-begin-on="#L-r2" data-begin-at="0.5"/>
 
-    <!-- médios -->
+    <!-- ramos médios (animam na sec2) -->
     <path id="L-r5" class="trace step2" d="M40 400 H500 V480 H300"
           data-begin-on="#L-backbone" data-begin-at="0.35"/>
     <path id="L-r6" class="trace step2" d="M40 550 H350 V640 H520"
           data-begin-on="#L-backbone" data-begin-at="0.45"/>
 
-    <!-- sub-ramos médios -->
+    <!-- sub-ramos médios (animam na sec3) -->
     <path id="L-r7" class="trace step3" d="M300 480 V600 H600"
           data-begin-on="#L-r5" data-begin-at="0.4"/>
     <path id="L-r8" class="trace step3" d="M520 640 V760 H700"
           data-begin-on="#L-r6" data-begin-at="0.4"/>
 
-    <!-- baixos -->
-    <path id="L-r9" class="trace step3" d="M40 800 H420 V900 H650"
+    <!-- ramos baixos (animam na sec3) -->
+    <path id="L-r9"  class="trace step3" d="M40 800 H420 V900 H650"
           data-begin-on="#L-backbone" data-begin-at="0.7"/>
     <path id="L-r10" class="trace step3" d="M40 1000 H280 V1080 H500"
           data-begin-on="#L-backbone" data-begin-at="0.85"/>
-
-    <!-- sub-ramos baixos -->
     <path id="L-r11" class="trace step3" d="M650 900 V1040 H820"
           data-begin-on="#L-r9" data-begin-at="0.5"/>
     <path id="L-r12" class="trace step3" d="M500 1080 V1160 H700"
@@ -67,8 +63,8 @@
     <circle class="pad" cx="650" cy="900" r="6"/>
     <circle class="pad" cx="500" cy="1080" r="6"/>
 
-    <!-- pulse -->
-    <circle class="pulse" r="5" fill="#1ec9b8">
+    <!-- pulse (só aparece a partir da sec2) -->
+    <circle class="pulse" data-step="2" r="5" fill="#1ec9b8">
       <animateMotion dur="10s" repeatCount="indefinite">
         <mpath href="#L-backbone"/>
       </animateMotion>
@@ -77,40 +73,34 @@
 
   <!-- ===== CIRCUITOS DIREITA ===== -->
   <svg class="circuit-svg right" viewBox="0 0 1000 1200" preserveAspectRatio="xMaxYMax meet">
-    <!-- backbone -->
+    <!-- backbone (estático na sec1) -->
     <path id="R-backbone" class="trace step1" d="M960 0 V1200"/>
 
     <!-- ramos diretos -->
-    <path id="R-r1" class="trace step1" d="M960 150 H700 V220 H880"
-          data-begin-on="#R-backbone" data-begin-at="0.12"/>
-    <path id="R-r2" class="trace step1" d="M960 250 H600 V320 H760"
-          data-begin-on="#R-backbone" data-begin-at="0.2"/>
+    <path id="R-r1" class="trace step1" d="M960 150 H700 V220 H880"/>
+    <path id="R-r2" class="trace step1" d="M960 250 H600 V320 H760"/>
 
-    <!-- sub-ramos -->
+    <!-- sub-ramos (sec2) -->
     <path id="R-r3" class="trace step2" d="M700 220 V360 H500"
           data-begin-on="#R-r1" data-begin-at="0.5"/>
     <path id="R-r4" class="trace step2" d="M760 320 V420 H560"
           data-begin-on="#R-r2" data-begin-at="0.6"/>
 
-    <!-- médios -->
+    <!-- médios (sec2) -->
     <path id="R-r5" class="trace step2" d="M960 450 H680 V520 H860"
           data-begin-on="#R-backbone" data-begin-at="0.4"/>
     <path id="R-r6" class="trace step2" d="M960 650 H750 V720 H950"
           data-begin-on="#R-backbone" data-begin-at="0.55"/>
 
-    <!-- sub-ramos médios -->
+    <!-- médios/baixos (sec3) -->
     <path id="R-r7" class="trace step3" d="M680 520 V640 H420"
           data-begin-on="#R-r5" data-begin-at="0.5"/>
     <path id="R-r8" class="trace step3" d="M950 720 V860 H620"
           data-begin-on="#R-r6" data-begin-at="0.4"/>
-
-    <!-- baixos -->
-    <path id="R-r9" class="trace step3" d="M960 850 H600 V920 H820"
+    <path id="R-r9"  class="trace step3" d="M960 850 H600 V920 H820"
           data-begin-on="#R-backbone" data-begin-at="0.75"/>
     <path id="R-r10" class="trace step3" d="M960 1050 H580 V1120 H400"
           data-begin-on="#R-backbone" data-begin-at="0.85"/>
-
-    <!-- sub-ramos baixos -->
     <path id="R-r11" class="trace step3" d="M820 920 V1040 H300"
           data-begin-on="#R-r9" data-begin-at="0.5"/>
     <path id="R-r12" class="trace step3" d="M400 1120 V1180 H200"
@@ -125,15 +115,15 @@
     <circle class="pad" cx="820" cy="920" r="6"/>
     <circle class="pad" cx="400" cy="1120" r="6"/>
 
-    <!-- pulse -->
-    <circle class="pulse" r="5" fill="#1ec9b8">
+    <!-- pulse (só aparece na step2+) -->
+    <circle class="pulse" data-step="2" r="5" fill="#1ec9b8">
       <animateMotion dur="10s" repeatCount="indefinite">
         <mpath href="#R-backbone"/>
       </animateMotion>
     </circle>
   </svg>
 
-  <!-- Conteúdo com scroll travado -->
+  <!-- Conteúdo com scroll-snap -->
   <main class="scroll-container">
     <section id="sec1" class="page-section">
       <h1>Seção 1</h1>
