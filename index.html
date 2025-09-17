@@ -3,19 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PCB Procedural Ajustado</title>
+<title>PCB Procedural – grow from empty</title>
 <style>
   :root{
-    --min-dur: 20s;
-    --max-dur: 40s;
+    /* janelas de tempo (ajuste à vontade) */
+    --min-dur: 10s;   /* duração mínima da animação de cada trilha */
+    --max-dur: 22s;   /* duração máxima da animação de cada trilha */
+    --build-window: 26s; /* atraso máx. para escalonar o início (stagger) */
   }
-  html,body{
+
+  html, body {
+    height:100%;
     margin:0;
     background:#0a0f0d;
     overflow:hidden;
-    height:100%;
   }
-  svg#pcb{
+  svg#pcb {
     width:100vw;
     height:100vh;
     display:block;
@@ -27,15 +30,33 @@
     stroke-linecap:round;
     stroke-linejoin:round;
     filter:drop-shadow(0 0 6px rgba(30,201,184,.75));
+    will-change: stroke-dashoffset, opacity;
+    shape-rendering:geometricPrecision;
   }
-  .trace.animated{
+
+  /* cresce e FICA desenhado (sem piscar) */
+  .trace.grow {
     stroke-dasharray: var(--len);
     stroke-dashoffset: var(--len);
-    animation: grow var(--dur, 24s) linear var(--delay, 0s) infinite;
+    animation: growHold var(--dur, 16s) linear var(--delay, 0s) forwards;
   }
-  @keyframes grow{
-    0%   { stroke-dashoffset: var(--len); opacity:.0; }
+
+  /* se quiser looping depois, troque 'grow' por 'loop' no JS */
+  .trace.loop {
+    stroke-dasharray: var(--len);
+    stroke-dashoffset: var(--len);
+    animation: growLoop var(--dur, 16s) linear var(--delay, 0s) infinite;
+  }
+
+  @keyframes growHold {
+    0%   { stroke-dashoffset: var(--len); opacity:0; }
     10%  { opacity:1; }
+    100% { stroke-dashoffset: 0; opacity:1; }
+  }
+
+  @keyframes growLoop {
+    0%   { stroke-dashoffset: var(--len); opacity:0; }
+    12%  { opacity:1; }
     60%  { stroke-dashoffset: 0; opacity:1; }
     100% { stroke-dashoffset: 0; opacity:0; }
   }
@@ -57,91 +78,123 @@
   <svg id="pcb"></svg>
 
 <script>
-(() => {
-  // ======= PARÂMETROS =======
-  const NUM_TRACES        = 200;   // menos trilhas
-  const FRACTION_ANIMATED = 0.5;   // metade animada
-  const NUM_PADS          = 80;
-  const NUM_CHIPS         = 15;
+(function () {
+  /* ====================== PARÂMETROS ====================== */
+  const NUM_TRACES   = 220;  // densidade de trilhas
+  const NUM_PADS     = 90;
+  const NUM_CHIPS    = 18;
 
-  const STEP              = 50;    // maior = “quadrados” maiores
-  const MIN_SEGMENTS      = 20;
-  const MAX_SEGMENTS      = 45;
+  const STEP         = 44;   // tamanho da malha (maior = quadrados maiores)
+  const MIN_SEGS     = 22;   // segmentos por trilha (comprimento)
+  const MAX_SEGS     = 52;
 
-  const DIRS = [[1,0],[-1,0],[0,1],[0,-1]]; // só 90°
+  const DIAG_PROB    = 0.22; // probabilidade de escolher 45° (mistura com 90°)
+  const LONG_RUN_P   = 0.55; // prob. de “avenida longa” na mesma direção
+  const LONG_RUN_MIN = 3;
+  const LONG_RUN_MAX = 8;
 
-  const rnd = (min, max) => Math.random()*(max-min)+min;
-  const rndi = (min, max) => Math.floor(rnd(min, max+1));
-  const choice = arr => arr[Math.floor(Math.random()*arr.length)];
+  const LOOP         = false; // FALSE = cresce e fica / TRUE = cresce, some e reinicia
 
-  const clamp = (x, min, max)=> x<min?min: x>max?max: x;
-
+  /* ====================== SETUP SVG ====================== */
   const svg = document.getElementById('pcb');
   const W = window.innerWidth;
   const H = window.innerHeight;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
 
-  function buildPath(startX, startY, segments){
-    let x = Math.floor(startX/STEP)*STEP;
-    let y = Math.floor(startY/STEP)*STEP;
+  /* ====================== HELPERS ====================== */
+  const rnd   = (a,b)=>Math.random()*(b-a)+a;
+  const rndi  = (a,b)=>Math.floor(rnd(a,b+1));
+  const clamp = (x,min,max)=> x<min?min: x>max?max: x;
+
+  const DIRS90 = [[1,0],[-1,0],[0,1],[0,-1]];
+  const DIRS45 = [[1,1],[-1,1],[1,-1],[-1,-1]];
+  const pick90 = ()=>DIRS90[Math.floor(Math.random()*DIRS90.length)];
+  const pick45 = ()=>DIRS45[Math.floor(Math.random()*DIRS45.length)];
+
+  const gx = v => Math.floor(v/STEP)*STEP;
+  const gy = v => Math.floor(v/STEP)*STEP;
+
+  function buildPath(x0, y0, segs){
+    let x = gx(x0), y = gy(y0);
     let d = `M${x} ${y}`;
-    for (let i=0; i<segments; i++){
-      let dir = choice(DIRS);
+    let runLeft = 0;
+    let dir = pick90();
+
+    for (let i=0;i<segs;i++){
+      if (runLeft<=0){
+        dir = (Math.random()<DIAG_PROB) ? pick45() : pick90();
+        runLeft = (Math.random()<LONG_RUN_P) ? rndi(LONG_RUN_MIN, LONG_RUN_MAX) : 1;
+      }
+      runLeft--;
+
       x += dir[0]*STEP;
       y += dir[1]*STEP;
-      x = clamp(x,0,W);
-      y = clamp(y,0,H);
+      x = clamp(x, 0, W);
+      y = clamp(y, 0, H);
       d += ` L${x} ${y}`;
     }
     return d;
   }
 
-  function addPath(d, animated){
+  function addPath(d, animate=true){
     const p = document.createElementNS('http://www.w3.org/2000/svg','path');
     p.setAttribute('d', d);
-    p.setAttribute('class','trace');
-    p.style.strokeWidth = Math.random()<.3 ? 3 : 1.5;
+    p.setAttribute('class', 'trace');
+
+    // espessuras variadas
+    const sw = Math.random()<.22 ? 3.2 : (Math.random()<.6 ? 2 : 1.4);
+    p.style.strokeWidth = sw;
     svg.appendChild(p);
 
-    const len = p.getTotalLength();
-    if(animated){
-      const dur = rnd(20,40).toFixed(2)+'s';
-      const delay = rnd(0,20).toFixed(2)+'s';
-      p.style.setProperty('--len', len);
+    // comprimento real e animação escalonada
+    const len = p.getTotalLength() || 1;
+    const minDur   = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--min-dur')) || 10;
+    const maxDur   = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--max-dur')) || 22;
+    const buildWin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--build-window')) || 26;
+
+    p.style.setProperty('--len', len);
+    if (animate){
+      const dur   = rnd(minDur, maxDur).toFixed(2)+'s';
+      const delay = rnd(0, buildWin).toFixed(2)+'s';
       p.style.setProperty('--dur', dur);
       p.style.setProperty('--delay', delay);
-      p.classList.add('animated');
-    }else{
+      p.classList.add(LOOP ? 'loop' : 'grow'); // decide o tipo
+    } else {
+      // se algum dia quiser trilha estática desde o começo:
       p.style.strokeDasharray = len;
-      p.style.strokeDashoffset = 0;
+      p.style.strokeDashoffset = len; // começa escondida
+      // e pode animar depois via JS se precisar
     }
+    return p;
   }
 
-  for(let i=0;i<NUM_TRACES;i++){
-    const d = buildPath(Math.random()*W, Math.random()*H, rndi(MIN_SEGMENTS,MAX_SEGMENTS));
-    addPath(d, Math.random()<FRACTION_ANIMATED);
+  /* ====================== GERAÇÃO ====================== */
+  for (let i=0;i<NUM_TRACES;i++){
+    const d = buildPath(Math.random()*W, Math.random()*H, rndi(MIN_SEGS, MAX_SEGS));
+    addPath(d, true); // todas animam (começa VAZIO e vai preenchendo)
   }
 
-  for(let i=0;i<NUM_PADS;i++){
-    const cx = Math.floor(Math.random()*W/STEP)*STEP;
-    const cy = Math.floor(Math.random()*H/STEP)*STEP;
+  for (let i=0;i<NUM_PADS;i++){
+    const cx = gx(Math.random()*W);
+    const cy = gy(Math.random()*H);
     const pad = document.createElementNS('http://www.w3.org/2000/svg','circle');
     pad.setAttribute('cx', cx);
     pad.setAttribute('cy', cy);
-    pad.setAttribute('r', Math.random()<.2 ? 6 : 4);
+    pad.setAttribute('r', Math.random()<.25 ? 6 : 4);
     pad.setAttribute('class','pad');
     svg.appendChild(pad);
   }
 
-  for(let i=0;i<NUM_CHIPS;i++){
-    const x = Math.random()*(W-100);
-    const y = Math.random()*(H-100);
+  for (let i=0;i<NUM_CHIPS;i++){
+    const x = gx(Math.random()*(W-120));
+    const y = gy(Math.random()*(H-120));
     const chip = document.createElementNS('http://www.w3.org/2000/svg','rect');
     chip.setAttribute('x', x);
     chip.setAttribute('y', y);
-    chip.setAttribute('width', 40+Math.random()*100);
-    chip.setAttribute('height',40+Math.random()*100);
+    chip.setAttribute('width',  40 + Math.random()*120);
+    chip.setAttribute('height', 40 + Math.random()*120);
     chip.setAttribute('class','chip');
+    chip.style.strokeWidth = Math.random()<.5 ? 2.5 : 4;
     svg.appendChild(chip);
   }
 })();
